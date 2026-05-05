@@ -2,7 +2,7 @@
   Networked Rock Paper Scissors
   IT 114 — Network Programming
   Author: Wu (ao453)
-  GitHub: github.com/walkdownwu/ao453-IT114-005
+  GitHub: github.com/walkdownwu/ao453-IT114-005-Project
 ============================================================
 
 ------------------------------------------------------------
