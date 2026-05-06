@@ -21,7 +21,11 @@ public class GameRoom extends Room {
         players.put(client.getClientId(), player);
         if (sessionCreator == -1) sessionCreator = client.getClientId();
         syncAllPoints();
-        if (currentPhase == Phase.WAITING) setPhase(Phase.READY_CHECK);
+        if (currentPhase == Phase.WAITING) {
+            setPhase(Phase.READY_CHECK);
+        } else {
+            client.sendPhase(currentPhase.name());
+        }
         Server.INSTANCE.broadcastRoomList();
     }
 
@@ -68,22 +72,29 @@ public class GameRoom extends Room {
         sendMessage(null, client.getClientName() + (away ? " is away" : " is back"));
     }
 
-    public synchronized void handleReturnToLobby(ServerThread client) {
-        Player player = players.get(client.getClientId());
-        if (player == null || player.hasReturnedToLobby()) return;
-        player.setReturnedToLobby(true);
-        returnedCount++;
+    private int playAgainCount = 0;
+
+    public synchronized void handlePlayAgain(ServerThread client) {
+        playAgainCount++;
         long activeCount = players.values().stream().filter(p -> !p.isSpectator()).count();
-        if (activeCount == 0 || returnedCount >= activeCount) {
-            returnedCount = 0;
-            for (Player p : players.values()) p.setReturnedToLobby(false);
-            resetForNewGame();
+        sendMessage(null, client.getClientName() + " wants to play again (" + playAgainCount + "/" + activeCount + ")");
+        if (playAgainCount >= activeCount) {
+            playAgainCount = 0;
+            for (Player p : players.values()) p.setReady(false);
             setPhase(Phase.READY_CHECK);
         }
     }
 
+    public synchronized void handleReturnToLobby(ServerThread client) {
+        Player player = players.get(client.getClientId());
+        if (player == null || player.hasReturnedToLobby()) return;
+        player.setReturnedToLobby(true);
+        // Move this client to lobby immediately
+        Server.INSTANCE.handleJoinRoom(client, rps.common.Constants.LOBBY);
+    }
+
     private void startSession() {
-        for (Player p : players.values()) p.reset();
+        for (Player p : players.values()) p.resetRound();
         syncAllPoints();
         startRound();
     }

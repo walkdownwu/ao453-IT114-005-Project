@@ -141,6 +141,12 @@ public class Client {
         send(p);
     }
 
+    public void sendPlayAgain() {
+        Payload p = new Payload();
+        p.setPayloadType(PayloadType.PLAY_AGAIN);
+        send(p);
+    }
+
     public void sendCreateRoom(String name, boolean isPrivate) {
         RoomPayload p = new RoomPayload();
         p.setPayloadType(PayloadType.CREATE_ROOM);

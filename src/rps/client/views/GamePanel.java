@@ -91,6 +91,18 @@ public class GamePanel extends JPanel {
         returnBtn.setVisible(false);
         actionRow.add(returnBtn);
 
+        JButton playAgainBtn = new JButton("Play Again");
+        playAgainBtn.setFont(new Font("Arial", Font.BOLD, 13));
+        playAgainBtn.setBackground(new Color(166, 227, 161));
+        playAgainBtn.setForeground(new Color(30, 30, 46));
+        playAgainBtn.setFocusPainted(false);
+        playAgainBtn.setBorder(BorderFactory.createEmptyBorder(8, 18, 8, 18));
+        playAgainBtn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        playAgainBtn.setName("playAgainBtn");
+        playAgainBtn.addActionListener(e -> parent.getClient().sendPlayAgain());
+        playAgainBtn.setVisible(false);
+        actionRow.add(playAgainBtn);
+
         southPanel.add(actionRow, BorderLayout.SOUTH);
         center.add(southPanel, BorderLayout.SOUTH);
         add(center, BorderLayout.CENTER);
@@ -142,6 +154,11 @@ public class GamePanel extends JPanel {
         phaseLabel.setText(phaseName(phase));
         returnBtn.setVisible(phase == Phase.GAME_OVER);
         awayBtn.setVisible(phase != Phase.GAME_OVER);
+        for (java.awt.Component c : returnBtn.getParent().getComponents()) {
+            if (c instanceof JButton && "playAgainBtn".equals(c.getName())) {
+                c.setVisible(phase == Phase.GAME_OVER);
+            }
+        }
     }
 
     private String phaseName(Phase p) {
